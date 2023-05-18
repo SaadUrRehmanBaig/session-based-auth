@@ -1,11 +1,13 @@
 const express = require("express")
 const jwt = require("jsonwebtoken")
 const session = require("express-session")
+const MongoStore = require('connect-mongo');
 
 const app = express()
 
 // middleware 
 const isAuthenticated = (req, res, next) => {
+    console.log(req.session)
     if (req.session.user) {
         try {
             const decoded = jwt.verify(req.session.user, "secret-key")
@@ -26,7 +28,8 @@ app.use(
         saveUninitialized: false,
         resave: true,
         rolling: true,
-        cookie: { maxAge: 10000 } //30 * 24 * 60 * 60 * 1000
+        cookie: { maxAge: 10000 }, //30 * 24 * 60 * 60 * 1000
+        store: MongoStore.create({ mongoUrl: 'mongodb://localhost:27017/admin' })
     })
 );
 
@@ -44,6 +47,7 @@ app.post("/login", async (req, res) => {
         const token = jwt.sign({ id: 1 }, "secret-key", { expiresIn: '1h' })
 
         req.session.user = token
+        console.log(req.session)
         res.send("user successfully logged in")
 
     } else {
