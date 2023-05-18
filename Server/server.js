@@ -7,7 +7,6 @@ const app = express()
 
 // middleware 
 const isAuthenticated = (req, res, next) => {
-    console.log(req.session)
     if (req.session.user) {
         try {
             const decoded = jwt.verify(req.session.user, "secret-key")
@@ -47,7 +46,6 @@ app.post("/login", async (req, res) => {
         const token = jwt.sign({ id: 1 }, "secret-key", { expiresIn: '1h' })
 
         req.session.user = token
-        console.log(req.session)
         res.send("user successfully logged in")
 
     } else {
